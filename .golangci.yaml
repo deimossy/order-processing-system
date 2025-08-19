@@ -1,0 +1,62 @@
+version: 2
+
+run:
+  timeout: 5m
+  tests: true
+
+linters:
+  enable:
+    # Core checks
+    - govet
+    - staticcheck
+    - unused
+
+    # Code style & readability
+    - revive
+    - misspell
+
+    # Bugs & error handling
+    - errcheck
+    - ineffassign
+    - gocritic
+
+    # Security checks
+    - gosec
+
+    # Dependency management
+    - depguard
+
+linters-settings:
+  revive:
+    severity: warning
+    rules:
+      - name: var-naming
+        disabled: true   # allow shorter names like ctx, db, id
+      - name: package-comments
+        disabled: true   # no need for mandatory package-level comments
+      - name: blank-imports
+        disabled: true   # allow blank imports (e.g. postgres driver)
+
+  gosec:
+    excludes:
+      - G104 # ignore "unhandled error" (already covered by errcheck)
+      - G304 # allow file inclusion via variable
+      - G404 # allow weak random in tests
+
+  depguard:
+    rules:
+      main:
+        list-type: denylist
+        packages:
+          - github.com/pkg/errors # forbid, use errors.Join / fmt.Errorf("%w") instead
+        packages-with-error-message:
+          github.com/pkg/errors: "use native errors from Go 1.20+"
+
+issues:
+  exclude-rules:
+    - linters:
+        - stylecheck
+      text: "ST1003" # allow abbreviations like ctx, db
+
+  max-issues-per-linter: 50
+  max-same-issues: 3
