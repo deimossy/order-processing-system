@@ -28,5 +28,6 @@ go.work.sum
 .idea/
 .vscode/
 
-# proto bins
+# binaries
 api/bin/
+pkg/bin/
