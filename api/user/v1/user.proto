@@ -1,0 +1,51 @@
+syntax = "proto3";
+
+package user.v1;
+
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/deimossy/order-processing-system/api/user/v1;user_v1";
+
+service UserService {
+  rpc Register(RegisterRequest) returns (TokenPair);
+  rpc Login(LoginRequest) returns (TokenPair);
+  rpc Refresh(RefreshRequest) returns (TokenPair);
+  rpc Logout(LogoutRequest) returns (google.protobuf.Empty);
+
+  rpc GetProfile(GetProfileRequest) returns (UserProfile);
+}
+
+message RegisterRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message LoginRequest {
+  string email = 1;
+  string password = 2;
+}
+
+message RefreshRequest {
+  string refresh_token = 1;
+}
+
+message LogoutRequest {
+  string refresh_token = 1;
+}
+
+message TokenPair {
+  string access_token = 1;
+  string refresh_token = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message GetProfileRequest {
+  string user_id = 1;
+}
+
+message UserProfile {
+  string user_id = 1;
+  string email = 2;
+  google.protobuf.Timestamp created_at = 4;
+}
