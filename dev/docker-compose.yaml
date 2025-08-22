@@ -1,0 +1,77 @@
+services:
+#  api-gateway:
+#    build: ../deploy/api-gateway
+
+  user-service:
+    build:
+      context: ../
+      dockerfile: deploy/user-service/Dockerfile
+    container_name: user-service
+    ports:
+      - "8080:8080"
+    env_file:
+      - ../.env
+    depends_on:
+      kafka:
+        condition: service_healthy
+      postgres:
+        condition: service_started
+    networks:
+      - my-network
+
+#  order-service:
+#    build: ../deploy/order-service
+#
+#  payment-service:
+#    build: ../deploy/payment-service
+#
+#  notification-service:
+#    build: ../deploy/notification-service
+
+  postgres:
+    image: postgres:17-alpine
+    env_file:
+      - ../.env
+    container_name: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my-network
+
+  goose:
+    build: ../tools/goose
+    container_name: goose
+    depends_on:
+      - postgres
+    entrypoint: [ "/goose/entrypoint.sh" ]
+    volumes:
+      - ../migrations:/migrations
+    env_file:
+      - ../.env
+    networks:
+      - my-network
+
+  kafka:
+    image: bitnami/kafka:4.0.0
+    hostname: kafka
+    container_name: kafka
+    env_file:
+      - ../.env
+    healthcheck:
+      test: [ "CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list" ]
+      interval: 4s
+      timeout: 2s
+      retries: 10
+    volumes:
+      - kafka_data:/bitnami/kafka/data
+    networks:
+      - my-network
+
+volumes:
+  postgres_data:
+  kafka_data:
+
+networks:
+  my-network:
