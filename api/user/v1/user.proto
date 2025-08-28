@@ -37,7 +37,7 @@ message LogoutRequest {
 message TokenPair {
   string access_token = 1;
   string refresh_token = 2;
-  google.protobuf.Timestamp expires_at = 3;
+  google.protobuf.Timestamp access_token_expires_at = 3;
 }
 
 message GetProfileRequest {
@@ -45,6 +45,6 @@ message GetProfileRequest {
 }
 
 message UserProfile {
-  string email = 2;
-  google.protobuf.Timestamp created_at = 4;
+  string email = 1;
+  google.protobuf.Timestamp created_at = 2;
 }
