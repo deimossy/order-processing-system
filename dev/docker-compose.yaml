@@ -8,16 +8,17 @@ services:
       dockerfile: deploy/user-service/Dockerfile
     container_name: user-service
     ports:
-      - "8080:8080"
+      - "10000:10000" # grpc
     env_file:
       - ../.env
     depends_on:
-      kafka:
-        condition: service_healthy
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_started
     networks:
-      - my-network
+      - ps
+      - redis
 
 #  order-service:
 #    build: ../deploy/order-service
@@ -30,6 +31,11 @@ services:
 
   postgres:
     image: postgres:17-alpine
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     env_file:
       - ../.env
     container_name: postgres
@@ -38,7 +44,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - my-network
+      - ps
 
   goose:
     build: ../tools/goose
@@ -51,27 +57,44 @@ services:
     env_file:
       - ../.env
     networks:
-      - my-network
+      - ps
 
-  kafka:
-    image: bitnami/kafka:4.0.0
-    hostname: kafka
-    container_name: kafka
-    env_file:
-      - ../.env
+  redis:
+    image: redis:7-alpine
     healthcheck:
-      test: [ "CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list" ]
-      interval: 4s
-      timeout: 2s
-      retries: 10
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    container_name: redis
+    ports:
+      - "6379:6379"
     volumes:
-      - kafka_data:/bitnami/kafka/data
+      - redis_data:/data
     networks:
-      - my-network
+      - redis
+
+#  kafka:
+#    image: bitnami/kafka:4.0.0
+#    hostname: kafka
+#    container_name: kafka
+#    env_file:
+#      - ../.env
+#    healthcheck:
+#      test: [ "CMD", "kafka-topics.sh", "--bootstrap-server", "localhost:9092", "--list" ]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+#    volumes:
+#      - kafka_data:/bitnami/kafka/data
+#    networks:
+#      - my-network
 
 volumes:
   postgres_data:
   kafka_data:
+  redis_data:
 
 networks:
-  my-network:
+  ps:
+  redis:
