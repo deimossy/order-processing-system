@@ -10,7 +10,7 @@ import (
 
 var ErrMaxRetriesAttemptsExceeded = errors.New("max retries attempts exceeded")
 
-func retry(ctx context.Context, fn func() error, maxRetries int, backoff time.Duration) error {
+func Do(ctx context.Context, maxRetries int, backoff time.Duration, fn func() error) error {
 	var err error
 
 	for attempt := 0; attempt < maxRetries; attempt++ {
