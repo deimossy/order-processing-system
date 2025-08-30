@@ -2,15 +2,15 @@ package postgres
 
 import (
 	"context"
-	"database/sql"
 	"log"
 
 	"github.com/deimossy/order-processing-system/internal/user/config"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jmoiron/sqlx"
 )
 
-func NewPgClient(ctx context.Context, cfg config.Config) *sql.DB {
-	db, err := sql.Open("pgx", cfg.PgDsn)
+func NewPgClient(ctx context.Context, cfg config.Config) *sqlx.DB {
+	db, err := sqlx.Open("pgx", cfg.PgDsn)
 	if err != nil {
 		log.Fatal(err)
 	}
