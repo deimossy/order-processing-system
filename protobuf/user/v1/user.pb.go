@@ -216,12 +216,12 @@ func (x *LogoutRequest) GetRefreshToken() string {
 }
 
 type TokenPair struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state                protoimpl.MessageState `protogen:"open.v1"`
+	AccessToken          string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
+	RefreshToken         string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
+	AccessTokenExpiresAt *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=access_token_expires_at,json=accessTokenExpiresAt,proto3" json:"access_token_expires_at,omitempty"`
+	unknownFields        protoimpl.UnknownFields
+	sizeCache            protoimpl.SizeCache
 }
 
 func (x *TokenPair) Reset() {
@@ -268,9 +268,9 @@ func (x *TokenPair) GetRefreshToken() string {
 	return ""
 }
 
-func (x *TokenPair) GetExpiresAt() *timestamppb.Timestamp {
+func (x *TokenPair) GetAccessTokenExpiresAt() *timestamppb.Timestamp {
 	if x != nil {
-		return x.ExpiresAt
+		return x.AccessTokenExpiresAt
 	}
 	return nil
 }
@@ -323,7 +323,7 @@ type UserProfile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -393,19 +393,18 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\x0eRefreshRequest\x12#\n" +
 	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"4\n" +
 	"\rLogoutRequest\x12#\n" +
-	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\x8e\x01\n" +
+	"\rrefresh_token\x18\x01 \x01(\tR\frefreshToken\"\xa6\x01\n" +
 	"\tTokenPair\x12!\n" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x129\n" +
-	"\n" +
-	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\",\n" +
+	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12Q\n" +
+	"\x17access_token_expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x14accessTokenExpiresAt\",\n" +
 	"\x11GetProfileRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"w\n" +
 	"\vUserProfile\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05email\x18\x02 \x01(\tR\x05email\x129\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xad\x02\n" +
+	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xad\x02\n" +
 	"\vUserService\x128\n" +
 	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x12.user.v1.TokenPair\x122\n" +
 	"\x05Login\x12\x15.user.v1.LoginRequest\x1a\x12.user.v1.TokenPair\x126\n" +
@@ -439,7 +438,7 @@ var file_user_v1_user_proto_goTypes = []any{
 	(*emptypb.Empty)(nil),         // 8: google.protobuf.Empty
 }
 var file_user_v1_user_proto_depIdxs = []int32{
-	7, // 0: user.v1.TokenPair.expires_at:type_name -> google.protobuf.Timestamp
+	7, // 0: user.v1.TokenPair.access_token_expires_at:type_name -> google.protobuf.Timestamp
 	7, // 1: user.v1.UserProfile.created_at:type_name -> google.protobuf.Timestamp
 	0, // 2: user.v1.UserService.Register:input_type -> user.v1.RegisterRequest
 	1, // 3: user.v1.UserService.Login:input_type -> user.v1.LoginRequest
