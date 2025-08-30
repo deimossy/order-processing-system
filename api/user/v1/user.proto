@@ -45,6 +45,7 @@ message GetProfileRequest {
 }
 
 message UserProfile {
-  string email = 1;
-  google.protobuf.Timestamp created_at = 2;
+  string user_id = 1;
+  string email = 2;
+  google.protobuf.Timestamp created_at = 3;
 }
