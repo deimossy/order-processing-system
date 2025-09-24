@@ -1,9 +1,10 @@
 package config
 
 import (
-	"github.com/caarlos0/env/v11"
 	"log/slog"
 	"time"
+
+	"github.com/caarlos0/env/v11"
 )
 
 type Config struct {
@@ -20,6 +21,7 @@ type Config struct {
 	PgQueryTimeout        time.Duration `env:"POSTGRES_QUERY_TIMEOUT"`
 	KafkaBackoff          time.Duration `env:"KAFKA_BACKOFF"`
 	KafkaMaxWait          time.Duration `env:"KAFKA_MAX_WAIT"`
+	BcryptCost            int           `env:"BCRYPT_COST"`
 }
 
 func NewConfig(logger *slog.Logger) Config {
