@@ -3,19 +3,15 @@ package postgres
 import (
 	"context"
 	"errors"
+
 	"github.com/deimossy/order-processing-system/internal/user/config"
 	"github.com/deimossy/order-processing-system/internal/user/domain"
 	"github.com/deimossy/order-processing-system/internal/user/usecase"
+	errs "github.com/deimossy/order-processing-system/pkg/errors"
+	helper "github.com/deimossy/order-processing-system/pkg/postgres"
 	"github.com/deimossy/order-processing-system/pkg/retry"
 	"github.com/jackc/pgx/v5"
-	"github.com/jackc/pgx/v5/pgconn"
 	"github.com/jmoiron/sqlx"
-)
-
-var (
-	ErrUserNotFound        = errors.New("user not found")
-	ErrUserAlreadyExists   = errors.New("user already exists")
-	ErrCodeUniqueViolation = "23505"
 )
 
 type PgUserRepo struct {
@@ -39,7 +35,7 @@ func (pg *PgUserRepo) SaveUser(ctx context.Context, user *domain.User) error {
 
 		_, err := pg.db.NamedExecContext(timeout, saveUserQuery, user)
 		if err != nil {
-			return checkUnique(err)
+			return helper.CheckUnique(err)
 		}
 
 		return nil
@@ -58,7 +54,7 @@ func (pg *PgUserRepo) GetByEmail(ctx context.Context, email string) (*domain.Use
 		err := pg.db.GetContext(timeout, user, getUserByEmailQuery, email)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				return ErrUserNotFound
+				return errs.ErrNotFound
 			}
 			return err
 		}
@@ -83,7 +79,7 @@ func (pg *PgUserRepo) GetByID(ctx context.Context, id string) (*domain.User, err
 		err := pg.db.GetContext(timeout, user, getUserByIDQuery, id)
 		if err != nil {
 			if errors.Is(err, pgx.ErrNoRows) {
-				return ErrUserNotFound
+				return errs.ErrNotFound
 			}
 			return err
 		}
@@ -113,20 +109,11 @@ func (pg *PgUserRepo) DeleteByID(ctx context.Context, id string) error {
 			return err
 		}
 		if rows == 0 {
-			return ErrUserNotFound
+			return errs.ErrNotFound
 		}
 
 		return nil
 	})
-
-	return err
-}
-
-func checkUnique(err error) error {
-	var pgErr *pgconn.PgError
-	if errors.As(err, &pgErr) && pgErr.Code == ErrCodeUniqueViolation {
-		return ErrUserAlreadyExists
-	}
 
 	return err
 }
