@@ -23,6 +23,8 @@ type Config struct {
 	KafkaBackoff          time.Duration `env:"KAFKA_BACKOFF"`
 	KafkaMaxWait          time.Duration `env:"KAFKA_MAX_WAIT"`
 	BcryptCost            int           `env:"BCRYPT_COST"`
+	RSAPrivateKeyPath     string        `env:"RSA_PRIVATE_KEY_PATH"`
+	RSAPublicKeyPath      string        `env:"RSA_PUBLIC_KEY_PATH"`
 }
 
 func NewConfig(logger *slog.Logger) Config {
