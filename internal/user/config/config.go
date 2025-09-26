@@ -18,6 +18,7 @@ type Config struct {
 	PgPingTimeout         time.Duration `env:"POSTGRES_PING_TIMEOUT"`
 	PgMaxRetries          int           `env:"POSTGRES_MAX_RETRIES"`
 	PgBackoff             time.Duration `env:"POSTGRES_BACKOFF"`
+	PgMaxBackoff          time.Duration `env:"POSTGRES_MAX_BACKOFF"`
 	PgQueryTimeout        time.Duration `env:"POSTGRES_QUERY_TIMEOUT"`
 	KafkaBackoff          time.Duration `env:"KAFKA_BACKOFF"`
 	KafkaMaxWait          time.Duration `env:"KAFKA_MAX_WAIT"`
