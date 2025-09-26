@@ -28,7 +28,7 @@ func NewPgUserRepo(db *sqlx.DB, cfg config.Config) *PgUserRepo {
 	}
 }
 
-func (pg *PgUserRepo) SaveUser(ctx context.Context, user *domain.User) error {
+func (pg *PgUserRepo) Save(ctx context.Context, user *domain.User) error {
 	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, pg.cfg.PgMaxBackoff, func() error {
 		timeout, cancel := context.WithTimeout(ctx, pg.cfg.PgQueryTimeout)
 		defer cancel()
