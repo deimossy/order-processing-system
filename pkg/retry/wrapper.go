@@ -2,40 +2,36 @@ package retry
 
 import (
 	"context"
-	"errors"
-	"math"
+	"fmt"
 	"math/rand"
 	"time"
+
+	errs "github.com/deimossy/order-processing-system/pkg/errors"
 )
 
-var ErrMaxRetriesAttemptsExceeded = errors.New("max retries attempts exceeded")
-
-func Do(ctx context.Context, maxRetries int, backoff time.Duration, fn func() error) error {
+func Do(ctx context.Context, maxRetries int, backoff, maxBackoff time.Duration, fn func() error) error {
 	var err error
 
 	for attempt := 0; attempt < maxRetries; attempt++ {
-		if ctx.Err() != nil {
-			return ctx.Err()
-		}
-
 		err = fn()
 		if err == nil {
 			return nil
 		}
 
 		if attempt == maxRetries-1 {
-			return err
+			break
 		}
 
-		backoff = backoff * time.Duration(math.Pow(2, float64(attempt)))
-		jitter := time.Duration(rand.Int63n(int64(backoff)))
+		delay := min(backoff*(1<<attempt), maxBackoff) // exp backoff
+
+		jitter := time.Duration(rand.Int63n(int64(delay)))
 
 		select {
 		case <-ctx.Done():
 			return ctx.Err()
-		case <-time.After(backoff + jitter):
+		case <-time.After(jitter): // full jitter
 		}
 	}
 
-	return ErrMaxRetriesAttemptsExceeded
+	return fmt.Errorf("%w: last error: %v", errs.ErrMaxRetriesAttemptsExceeded, err)
 }

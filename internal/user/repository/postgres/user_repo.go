@@ -29,7 +29,7 @@ func NewPgUserRepo(db *sqlx.DB, cfg config.Config) *PgUserRepo {
 }
 
 func (pg *PgUserRepo) SaveUser(ctx context.Context, user *domain.User) error {
-	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, func() error {
+	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, pg.cfg.PgMaxBackoff, func() error {
 		timeout, cancel := context.WithTimeout(ctx, pg.cfg.PgQueryTimeout)
 		defer cancel()
 
@@ -47,7 +47,7 @@ func (pg *PgUserRepo) SaveUser(ctx context.Context, user *domain.User) error {
 func (pg *PgUserRepo) GetByEmail(ctx context.Context, email string) (*domain.User, error) {
 	user := &domain.User{}
 
-	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, func() error {
+	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, pg.cfg.PgMaxBackoff, func() error {
 		timeout, cancel := context.WithTimeout(ctx, pg.cfg.PgQueryTimeout)
 		defer cancel()
 
@@ -72,7 +72,7 @@ func (pg *PgUserRepo) GetByEmail(ctx context.Context, email string) (*domain.Use
 func (pg *PgUserRepo) GetByID(ctx context.Context, id string) (*domain.User, error) {
 	user := &domain.User{}
 
-	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, func() error {
+	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, pg.cfg.PgMaxBackoff, func() error {
 		timeout, cancel := context.WithTimeout(ctx, pg.cfg.PgQueryTimeout)
 		defer cancel()
 
@@ -95,7 +95,7 @@ func (pg *PgUserRepo) GetByID(ctx context.Context, id string) (*domain.User, err
 }
 
 func (pg *PgUserRepo) DeleteByID(ctx context.Context, id string) error {
-	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, func() error {
+	err := retry.Do(ctx, pg.cfg.PgMaxRetries, pg.cfg.PgBackoff, pg.cfg.PgMaxBackoff, func() error {
 		timeout, cancel := context.WithTimeout(ctx, pg.cfg.PgQueryTimeout)
 		defer cancel()
 
