@@ -25,6 +25,8 @@ type Config struct {
 	BcryptCost            int           `env:"BCRYPT_COST"`
 	RSAPrivateKeyPath     string        `env:"RSA_PRIVATE_KEY_PATH"`
 	RSAPublicKeyPath      string        `env:"RSA_PUBLIC_KEY_PATH"`
+	AccessTokenTTL        time.Duration `env:"ACCESS_TOKEN_TTL"`
+	RefreshTokenTTL       time.Duration `env:"REFRESH_TOKEN_TTL"`
 }
 
 func NewConfig(logger *slog.Logger) Config {
