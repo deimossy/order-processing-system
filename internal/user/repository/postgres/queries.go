@@ -6,7 +6,7 @@ const (
 		email, password_hash
 	) VALUES (
 		:email, :password_hash
-	);
+	) RETURNING id;
     `
 	getUserByEmailQuery = `
 	SELECT id, email, password_hash, created_at

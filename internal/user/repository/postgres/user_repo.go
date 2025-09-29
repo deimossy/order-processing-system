@@ -33,7 +33,10 @@ func (pg *PgUserRepo) Save(ctx context.Context, user *domain.User) error {
 		timeout, cancel := context.WithTimeout(ctx, pg.cfg.PgQueryTimeout)
 		defer cancel()
 
-		_, err := pg.db.NamedExecContext(timeout, saveUserQuery, user)
+		err := pg.db.QueryRowxContext(timeout, saveUserQuery,
+			user.Email,
+			user.PasswordHash,
+		).Scan(&user.ID)
 		if err != nil {
 			return helper.CheckUnique(err)
 		}
