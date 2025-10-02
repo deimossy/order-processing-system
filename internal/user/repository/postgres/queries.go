@@ -5,7 +5,7 @@ const (
 	INSERT INTO users (
 		email, password_hash
 	) VALUES (
-		:email, :password_hash
+		$1, $2
 	) RETURNING id;
     `
 	getUserByEmailQuery = `
@@ -24,9 +24,9 @@ const (
 	`
 	saveRefreshTokenQuery = `
 	INSERT INTO refresh_tokens (
-		user_id, token_hash, expires_at
+		id, user_id, token_hash, expires_at
 	) VALUES (
-		:user_id, :token_hash, :expires_at
+		:id, :user_id, :token_hash, :expires_at
 	);
 	`
 	getRefreshTokenByTokenHashQuery = `
