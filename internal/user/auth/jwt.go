@@ -28,13 +28,13 @@ func GenerateAccessToken(userID, email string, privKey *rsa.PrivateKey, ttl time
 
 	claims := &jwt.MapClaims{
 		"sub":   userID,
-		"exp":   exp,
-		"iat":   time.Now().UTC(),
+		"exp":   jwt.NewNumericDate(exp),
+		"iat":   jwt.NewNumericDate(time.Now().UTC()),
 		"jti":   uuid.New().String(),
 		"email": email,
 	}
 
-	rawToken := jwt.NewWithClaims(jwt.SigningMethodPS256, claims)
+	rawToken := jwt.NewWithClaims(jwt.SigningMethodRS256, claims)
 
 	signedToken, err := rawToken.SignedString(privKey)
 	if err != nil {
