@@ -31,3 +31,6 @@ go.work.sum
 # binaries
 api/bin/
 pkg/bin/
+
+# rsa-keys
+rsa_keys/
