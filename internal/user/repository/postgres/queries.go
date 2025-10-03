@@ -39,4 +39,9 @@ const (
 	SET revoked_at = $1
 	WHERE token_hash = $2;
 	`
+	revokeAllRefreshTokenByUserIdQuery = `
+	UPDATE refresh_tokens
+	SET revoked_at = $1
+	WHERE user_id = $2;
+	`
 )

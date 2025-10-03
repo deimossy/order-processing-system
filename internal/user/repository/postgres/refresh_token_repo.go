@@ -32,7 +32,7 @@ func (pg *PgRefreshTokenRepo) Save(ctx context.Context, token *domain.RefreshTok
 		return err
 	}
 
-	return err
+	return nil
 }
 
 func (pg *PgRefreshTokenRepo) GetByTokenHash(ctx context.Context, token string) (*domain.RefreshToken, error) {
@@ -52,7 +52,7 @@ func (pg *PgRefreshTokenRepo) GetByTokenHash(ctx context.Context, token string) 
 	return refreshToken, nil
 }
 
-func (pg *PgRefreshTokenRepo) RevokeByTokenHash(ctx context.Context, token string) error {
+func (pg *PgRefreshTokenRepo) RevokeAllByTokenHash(ctx context.Context, token string) error {
 	timeout, cancel := context.WithTimeout(ctx, pg.queryTimeout)
 	defer cancel()
 
@@ -69,5 +69,25 @@ func (pg *PgRefreshTokenRepo) RevokeByTokenHash(ctx context.Context, token strin
 		return errs.ErrNotFound
 	}
 
-	return err
+	return nil
+}
+
+func (pg *PgRefreshTokenRepo) RevokeAllByUserId(ctx context.Context, userId string) error {
+	timeout, cancel := context.WithTimeout(ctx, pg.queryTimeout)
+	defer cancel()
+
+	r, err := pg.db.ExecContext(timeout, revokeAllRefreshTokenByUserIdQuery, time.Now().UTC(), userId)
+	if err != nil {
+		return err
+	}
+
+	rows, err := r.RowsAffected()
+	if err != nil {
+		return err
+	}
+	if rows == 0 {
+		return errs.ErrNotFound
+	}
+
+	return nil
 }
