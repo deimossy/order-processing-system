@@ -17,7 +17,7 @@ func GenerateRefreshToken(userID string, ttl time.Duration) (*domain.RefreshToke
 		return nil, "", err
 	}
 
-	hashed := hashToken(plain)
+	hashed := HashToken(plain)
 
 	token := &domain.RefreshToken{
 		ID:        uuid.New().String(),
@@ -39,7 +39,7 @@ func generatePlainToken(n int) (string, error) {
 	return base64.URLEncoding.EncodeToString(b), nil
 }
 
-func hashToken(plain string) string {
+func HashToken(plain string) string {
 	h := sha256.Sum256([]byte(plain))
 	return hex.EncodeToString(h[:])
 }
