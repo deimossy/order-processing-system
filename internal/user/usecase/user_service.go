@@ -14,7 +14,8 @@ import (
 type RefreshTokenRepo interface {
 	Save(ctx context.Context, token *domain.RefreshToken) error
 	GetByTokenHash(ctx context.Context, token string) (*domain.RefreshToken, error)
-	RevokeByTokenHash(ctx context.Context, token string) error
+	RevokeAllByTokenHash(ctx context.Context, token string) error
+	RevokeAllByUserId(ctx context.Context, userId string) error
 }
 
 type UserRepo interface {
@@ -50,8 +51,8 @@ func NewUserService(cfg config.Config, uow UnitOfWork, key *rsa.PrivateKey) *Use
 
 func (s *UserService) Register(ctx context.Context, email, password string) (*domain.TokenPair, error) {
 	var (
-		user  *domain.User
 		token *domain.TokenPair
+		user  *domain.User
 	)
 
 	err := s.uow.WithTx(ctx, func(ctx context.Context, repos Repositories) error {
@@ -95,6 +96,7 @@ func (s *UserService) Register(ctx context.Context, email, password string) (*do
 
 		token = &domain.TokenPair{
 			RefreshToken: plain,
+			UserID:       user.ID,
 		}
 
 		return repos.RefreshTokenRepo().Save(ctx, refreshToken)
@@ -104,12 +106,11 @@ func (s *UserService) Register(ctx context.Context, email, password string) (*do
 	}
 
 	// generate access token
-	accessToken, exp, err := auth.GenerateAccessToken(user.ID, user.Email, s.privateKey, s.cfg.AccessTokenTTL)
+	accessToken, exp, err := auth.GenerateAccessToken(user.ID, email, s.privateKey, s.cfg.AccessTokenTTL)
 	if err != nil {
 		return nil, err
 	}
 
-	token.UserID = user.ID
 	token.AccessToken = accessToken
 	token.ExpiresAt = exp
 
@@ -117,13 +118,145 @@ func (s *UserService) Register(ctx context.Context, email, password string) (*do
 }
 
 func (s *UserService) Login(ctx context.Context, email, password string) (*domain.TokenPair, error) {
-	return nil, nil
+	var token *domain.TokenPair
+
+	err := s.uow.WithTx(ctx, func(ctx context.Context, repos Repositories) error {
+		user, err := repos.UserRepo().GetByEmail(ctx, email)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				return errs.ErrUserNotFound
+			}
+			return err
+		}
+
+		if !auth.CheckPasswordHash(password, user.PasswordHash) {
+			return errs.ErrPasswordMismatch
+		}
+
+		refreshToken, plain, err := auth.GenerateRefreshToken(user.ID, s.cfg.RefreshTokenTTL)
+		if err != nil {
+			return err
+		}
+
+		token = &domain.TokenPair{
+			RefreshToken: plain,
+			UserID:       user.ID,
+		}
+
+		err = repos.RefreshTokenRepo().RevokeAllByUserId(ctx, user.ID)
+		if err != nil && !errors.Is(err, errs.ErrNotFound) {
+			return err
+		}
+
+		return repos.RefreshTokenRepo().Save(ctx, refreshToken)
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	accessToken, exp, err := auth.GenerateAccessToken(token.UserID, email, s.privateKey, s.cfg.AccessTokenTTL)
+	if err != nil {
+		return nil, err
+	}
+
+	token.AccessToken = accessToken
+	token.ExpiresAt = exp
+
+	return token, nil
 }
 
-func (s *UserService) Logout(ctx context.Context, token string) error {
+func (s *UserService) Logout(ctx context.Context, plainRefreshToken string) error {
+	hashedRefreshToken := auth.HashToken(plainRefreshToken)
+
+	err := s.uow.WithoutTx(ctx, func(ctx context.Context, repos Repositories) error {
+		err := repos.RefreshTokenRepo().RevokeAllByTokenHash(ctx, hashedRefreshToken)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				return errs.ErrUserNotFound
+			}
+			return err
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
 	return nil
 }
 
-func (s *UserService) RefreshToken(ctx context.Context, token string) (*domain.TokenPair, error) {
-	return nil, nil
+func (s *UserService) Refresh(ctx context.Context, plainRefreshToken string) (*domain.TokenPair, error) {
+	hashedRefreshToken := auth.HashToken(plainRefreshToken)
+	var (
+		token *domain.TokenPair
+		user  *domain.User
+	)
+
+	err := s.uow.WithTx(ctx, func(ctx context.Context, repos Repositories) error {
+		refreshToken, err := repos.RefreshTokenRepo().GetByTokenHash(ctx, hashedRefreshToken)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				return errs.ErrRefreshTokenNotFound
+			}
+			return err
+		}
+
+		if refreshToken.RevokedAt != nil {
+			return errs.ErrRefreshTokenRevoked
+		}
+
+		if refreshToken.ExpiresAt.Before(time.Now()) {
+			return errs.ErrRefreshTokenExpired
+		}
+
+		user, err = repos.UserRepo().GetByID(ctx, refreshToken.UserID)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				return errs.ErrUserNotFound
+			}
+			return err
+		}
+
+		newRefreshToken, newPlainRefreshToken, err := auth.GenerateRefreshToken(user.ID, s.cfg.RefreshTokenTTL)
+		if err != nil {
+			return err
+		}
+
+		err = repos.RefreshTokenRepo().Save(ctx, newRefreshToken)
+		if err != nil {
+			return err
+		}
+
+		err = repos.RefreshTokenRepo().RevokeAllByTokenHash(ctx, hashedRefreshToken)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				return errs.ErrRefreshTokenNotFound
+			}
+			return err
+		}
+
+		token = &domain.TokenPair{
+			RefreshToken: newPlainRefreshToken,
+			UserID:       user.ID,
+		}
+
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	accessToken, exp, err := auth.GenerateAccessToken(user.ID, user.Email, s.privateKey, s.cfg.AccessTokenTTL)
+	if err != nil {
+		return nil, err
+	}
+
+	token.AccessToken = accessToken
+	token.ExpiresAt = exp
+
+	return token, nil
 }
