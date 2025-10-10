@@ -12,3 +12,9 @@ plugins:
     out: ../protobuf
     opt:
       - paths=source_relative
+
+  - local: bin/protoc-gen-validate
+    out: ../protobuf
+    opt:
+      - paths=source_relative
+      - lang=go

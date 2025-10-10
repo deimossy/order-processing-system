@@ -4,6 +4,7 @@ package user.v1;
 
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
+import "validate/validate.proto";
 
 option go_package = "github.com/deimossy/order-processing-system/api/user/v1;user_v1";
 
@@ -17,31 +18,31 @@ service UserService {
 }
 
 message RegisterRequest {
-  string email = 1;
-  string password = 2;
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string = {min_len: 5, max_len: 50}];
 }
 
 message LoginRequest {
-  string email = 1;
-  string password = 2;
+  string email = 1 [(validate.rules).string.email = true];
+  string password = 2 [(validate.rules).string.min_len = 1];
 }
 
 message RefreshRequest {
-  string refresh_token = 1;
+  string refresh_token = 1 [(validate.rules).string.min_len = 1];
 }
 
 message LogoutRequest {
-  string refresh_token = 1;
+  string refresh_token = 1 [(validate.rules).string.min_len = 1];
+}
+
+message GetProfileRequest {
+  string user_id = 1 [(validate.rules).string.min_len = 1];
 }
 
 message TokenPair {
   string access_token = 1;
   string refresh_token = 2;
   google.protobuf.Timestamp access_token_expires_at = 3;
-}
-
-message GetProfileRequest {
-  string user_id = 1;
 }
 
 message UserProfile {
