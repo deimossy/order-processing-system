@@ -14,11 +14,13 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
-      redis:
-        condition: service_started
+#      redis:
+#        condition: service_started
+    volumes:
+      - ../rsa_keys:/rsa_keys
     networks:
-      - ps
-      - redis
+      - postgre
+#      - redis
 
 #  order-service:
 #    build: ../deploy/order-service
@@ -32,7 +34,7 @@ services:
   postgres:
     image: postgres:17-alpine
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready" ]
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -44,7 +46,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     networks:
-      - ps
+      - postgre
 
   goose:
     build: ../tools/goose
@@ -57,22 +59,22 @@ services:
     env_file:
       - ../.env
     networks:
-      - ps
+      - postgre
 
-  redis:
-    image: redis:7-alpine
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-    container_name: redis
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis_data:/data
-    networks:
-      - redis
+#  redis:
+#    image: redis:7-alpine
+#    healthcheck:
+#      test: ["CMD", "redis-cli", "ping"]
+#      interval: 5s
+#      timeout: 5s
+#      retries: 5
+#    container_name: redis
+#    ports:
+#      - "6379:6379"
+#    volumes:
+#      - redis_data:/data
+#    networks:
+#      - redis
 
 #  kafka:
 #    image: bitnami/kafka:4.0.0
@@ -93,8 +95,8 @@ services:
 volumes:
   postgres_data:
   kafka_data:
-  redis_data:
+#  redis_data:
 
 networks:
-  ps:
-  redis:
+  postgre:
+#  redis:
