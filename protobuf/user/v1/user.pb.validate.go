@@ -770,6 +770,8 @@ func (m *TokenPair) validate(all bool) error {
 		}
 	}
 
+	// no validation rules for UserId
+
 	if len(errors) > 0 {
 		return TokenPairMultiError(errors)
 	}
