@@ -6,7 +6,6 @@ var (
 	// repo errs
 	ErrNotFound      = errors.New("not found")
 	ErrAlreadyExists = errors.New("already exists")
-	ErrValidation    = errors.New("validation error")
 
 	// access token errs
 	ErrAccessTokenExpired = errors.New("access token has been expires")
