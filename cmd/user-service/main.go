@@ -55,18 +55,21 @@ func main() {
 
 	userService := usecase.NewUserService(cfg, uow, privKey)
 
-	controller := grpc.NewController(userService)
-	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.ServerGRPCPort))
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%s", cfg.ServerGRPCPort))
 	if err != nil {
 		log.Fatalf("failed to listen: %v", err)
 	}
+
 	s := rpc.NewServer()
+	controller := grpc.NewController(userService)
 	user_v1.RegisterUserServiceServer(s, controller)
+
 	reflection.Register(s)
+	
 	server := grpc.NewServer(logger, s, lis)
 
 	go func() {
-		if err := server.Run(); err != nil {
+		if err = server.Run(); err != nil {
 			return
 		}
 	}()
