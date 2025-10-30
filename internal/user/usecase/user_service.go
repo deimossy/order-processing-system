@@ -14,7 +14,7 @@ import (
 type RefreshTokenRepo interface {
 	Save(ctx context.Context, token *domain.RefreshToken) error
 	GetByTokenHash(ctx context.Context, token string) (*domain.RefreshToken, error)
-	RevokeAllByTokenHash(ctx context.Context, token string) error
+	RevokeByTokenHash(ctx context.Context, token string) error
 	RevokeAllByUserId(ctx context.Context, userId string) error
 }
 
@@ -121,6 +121,7 @@ func (s *UserService) Login(ctx context.Context, email, password string) (*domai
 	var token *domain.TokenPair
 
 	err := s.uow.WithTx(ctx, func(ctx context.Context, repos Repositories) error {
+		// check user
 		user, err := repos.UserRepo().GetByEmail(ctx, email)
 		if err != nil {
 			if errors.Is(err, errs.ErrNotFound) {
@@ -129,10 +130,12 @@ func (s *UserService) Login(ctx context.Context, email, password string) (*domai
 			return err
 		}
 
+		// validate password
 		if !auth.CheckPasswordHash(password, user.PasswordHash) {
 			return errs.ErrPasswordMismatch
 		}
 
+		// generate new refresh token
 		refreshToken, plain, err := auth.GenerateRefreshToken(user.ID, s.cfg.RefreshTokenTTL)
 		if err != nil {
 			return err
@@ -143,6 +146,7 @@ func (s *UserService) Login(ctx context.Context, email, password string) (*domai
 			UserID:       user.ID,
 		}
 
+		// revoke all old refresh tokens
 		err = repos.RefreshTokenRepo().RevokeAllByUserId(ctx, user.ID)
 		if err != nil && !errors.Is(err, errs.ErrNotFound) {
 			return err
@@ -155,6 +159,7 @@ func (s *UserService) Login(ctx context.Context, email, password string) (*domai
 		return nil, err
 	}
 
+	// generate new access token
 	accessToken, exp, err := auth.GenerateAccessToken(token.UserID, email, s.privateKey, s.cfg.AccessTokenTTL)
 	if err != nil {
 		return nil, err
@@ -170,10 +175,11 @@ func (s *UserService) Logout(ctx context.Context, plainRefreshToken string) erro
 	hashedRefreshToken := auth.HashToken(plainRefreshToken)
 
 	err := s.uow.WithoutTx(ctx, func(ctx context.Context, repos Repositories) error {
-		err := repos.RefreshTokenRepo().RevokeAllByTokenHash(ctx, hashedRefreshToken)
+		// revoke all refresh tokens
+		err := repos.RefreshTokenRepo().RevokeByTokenHash(ctx, hashedRefreshToken)
 		if err != nil {
 			if errors.Is(err, errs.ErrNotFound) {
-				return errs.ErrUserNotFound
+				return errs.ErrRefreshTokenNotFound
 			}
 			return err
 		}
@@ -196,6 +202,7 @@ func (s *UserService) Refresh(ctx context.Context, plainRefreshToken string) (*d
 	)
 
 	err := s.uow.WithTx(ctx, func(ctx context.Context, repos Repositories) error {
+		// get refresh token
 		refreshToken, err := repos.RefreshTokenRepo().GetByTokenHash(ctx, hashedRefreshToken)
 		if err != nil {
 			if errors.Is(err, errs.ErrNotFound) {
@@ -204,6 +211,7 @@ func (s *UserService) Refresh(ctx context.Context, plainRefreshToken string) (*d
 			return err
 		}
 
+		// validating refresh token
 		if refreshToken.RevokedAt != nil {
 			return errs.ErrRefreshTokenRevoked
 		}
@@ -212,6 +220,7 @@ func (s *UserService) Refresh(ctx context.Context, plainRefreshToken string) (*d
 			return errs.ErrRefreshTokenExpired
 		}
 
+		// get user
 		user, err = repos.UserRepo().GetByID(ctx, refreshToken.UserID)
 		if err != nil {
 			if errors.Is(err, errs.ErrNotFound) {
@@ -220,17 +229,20 @@ func (s *UserService) Refresh(ctx context.Context, plainRefreshToken string) (*d
 			return err
 		}
 
+		// generate new refresh token
 		newRefreshToken, newPlainRefreshToken, err := auth.GenerateRefreshToken(user.ID, s.cfg.RefreshTokenTTL)
 		if err != nil {
 			return err
 		}
 
+		// saving new refresh token
 		err = repos.RefreshTokenRepo().Save(ctx, newRefreshToken)
 		if err != nil {
 			return err
 		}
 
-		err = repos.RefreshTokenRepo().RevokeAllByTokenHash(ctx, hashedRefreshToken)
+		// revoke old refresh token
+		err = repos.RefreshTokenRepo().RevokeByTokenHash(ctx, hashedRefreshToken)
 		if err != nil {
 			if errors.Is(err, errs.ErrNotFound) {
 				return errs.ErrRefreshTokenNotFound
@@ -250,6 +262,7 @@ func (s *UserService) Refresh(ctx context.Context, plainRefreshToken string) (*d
 		return nil, err
 	}
 
+	// generate access token
 	accessToken, exp, err := auth.GenerateAccessToken(user.ID, user.Email, s.privateKey, s.cfg.AccessTokenTTL)
 	if err != nil {
 		return nil, err

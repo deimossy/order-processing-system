@@ -52,7 +52,7 @@ func (pg *PgRefreshTokenRepo) GetByTokenHash(ctx context.Context, token string) 
 	return refreshToken, nil
 }
 
-func (pg *PgRefreshTokenRepo) RevokeAllByTokenHash(ctx context.Context, token string) error {
+func (pg *PgRefreshTokenRepo) RevokeByTokenHash(ctx context.Context, token string) error {
 	timeout, cancel := context.WithTimeout(ctx, pg.queryTimeout)
 	defer cancel()
 
