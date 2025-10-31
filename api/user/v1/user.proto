@@ -14,7 +14,8 @@ service UserService {
   rpc Refresh(RefreshRequest) returns (TokenPair);
   rpc Logout(LogoutRequest) returns (google.protobuf.Empty);
 
-  rpc GetProfile(GetProfileRequest) returns (UserProfile);
+  rpc GetPaymentProfile(GetProfileRequest) returns (PaymentProfile);
+  rpc GetNotificationProfile(GetProfileRequest) returns (NotificationProfile);
 }
 
 message RegisterRequest {
@@ -46,8 +47,12 @@ message TokenPair {
   string user_id = 4;
 }
 
-message UserProfile {
+message NotificationProfile {
   string user_id = 1;
   string email = 2;
-  google.protobuf.Timestamp created_at = 3;
+}
+
+message PaymentProfile {
+  string user_id = 1;
+  string payment_details = 2;
 }
