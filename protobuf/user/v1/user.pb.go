@@ -328,29 +328,28 @@ func (x *TokenPair) GetUserId() string {
 	return ""
 }
 
-type UserProfile struct {
+type NotificationProfile struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	Email         string                 `protobuf:"bytes,2,opt,name=email,proto3" json:"email,omitempty"`
-	CreatedAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *UserProfile) Reset() {
-	*x = UserProfile{}
+func (x *NotificationProfile) Reset() {
+	*x = NotificationProfile{}
 	mi := &file_user_v1_user_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *UserProfile) String() string {
+func (x *NotificationProfile) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*UserProfile) ProtoMessage() {}
+func (*NotificationProfile) ProtoMessage() {}
 
-func (x *UserProfile) ProtoReflect() protoreflect.Message {
+func (x *NotificationProfile) ProtoReflect() protoreflect.Message {
 	mi := &file_user_v1_user_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -362,30 +361,75 @@ func (x *UserProfile) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use UserProfile.ProtoReflect.Descriptor instead.
-func (*UserProfile) Descriptor() ([]byte, []int) {
+// Deprecated: Use NotificationProfile.ProtoReflect.Descriptor instead.
+func (*NotificationProfile) Descriptor() ([]byte, []int) {
 	return file_user_v1_user_proto_rawDescGZIP(), []int{6}
 }
 
-func (x *UserProfile) GetUserId() string {
+func (x *NotificationProfile) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *UserProfile) GetEmail() string {
+func (x *NotificationProfile) GetEmail() string {
 	if x != nil {
 		return x.Email
 	}
 	return ""
 }
 
-func (x *UserProfile) GetCreatedAt() *timestamppb.Timestamp {
+type PaymentProfile struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	UserId         string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	PaymentDetails string                 `protobuf:"bytes,2,opt,name=payment_details,json=paymentDetails,proto3" json:"payment_details,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *PaymentProfile) Reset() {
+	*x = PaymentProfile{}
+	mi := &file_user_v1_user_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *PaymentProfile) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*PaymentProfile) ProtoMessage() {}
+
+func (x *PaymentProfile) ProtoReflect() protoreflect.Message {
+	mi := &file_user_v1_user_proto_msgTypes[7]
 	if x != nil {
-		return x.CreatedAt
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
 	}
-	return nil
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use PaymentProfile.ProtoReflect.Descriptor instead.
+func (*PaymentProfile) Descriptor() ([]byte, []int) {
+	return file_user_v1_user_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *PaymentProfile) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *PaymentProfile) GetPaymentDetails() string {
+	if x != nil {
+		return x.PaymentDetails
+	}
+	return ""
 }
 
 var File_user_v1_user_proto protoreflect.FileDescriptor
@@ -409,19 +453,20 @@ const file_user_v1_user_proto_rawDesc = "" +
 	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
 	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12Q\n" +
 	"\x17access_token_expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\x14accessTokenExpiresAt\x12\x17\n" +
-	"\auser_id\x18\x04 \x01(\tR\x06userId\"w\n" +
-	"\vUserProfile\x12\x17\n" +
+	"\auser_id\x18\x04 \x01(\tR\x06userId\"D\n" +
+	"\x13NotificationProfile\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
-	"\x05email\x18\x02 \x01(\tR\x05email\x129\n" +
-	"\n" +
-	"created_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xad\x02\n" +
+	"\x05email\x18\x02 \x01(\tR\x05email\"R\n" +
+	"\x0ePaymentProfile\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12'\n" +
+	"\x0fpayment_details\x18\x02 \x01(\tR\x0epaymentDetails2\x8b\x03\n" +
 	"\vUserService\x128\n" +
 	"\bRegister\x12\x18.user.v1.RegisterRequest\x1a\x12.user.v1.TokenPair\x122\n" +
 	"\x05Login\x12\x15.user.v1.LoginRequest\x1a\x12.user.v1.TokenPair\x126\n" +
 	"\aRefresh\x12\x17.user.v1.RefreshRequest\x1a\x12.user.v1.TokenPair\x128\n" +
-	"\x06Logout\x12\x16.user.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\x12>\n" +
-	"\n" +
-	"GetProfile\x12\x1a.user.v1.GetProfileRequest\x1a\x14.user.v1.UserProfileBAZ?github.com/deimossy/order-processing-system/api/user/v1;user_v1b\x06proto3"
+	"\x06Logout\x12\x16.user.v1.LogoutRequest\x1a\x16.google.protobuf.Empty\x12H\n" +
+	"\x11GetPaymentProfile\x12\x1a.user.v1.GetProfileRequest\x1a\x17.user.v1.PaymentProfile\x12R\n" +
+	"\x16GetNotificationProfile\x12\x1a.user.v1.GetProfileRequest\x1a\x1c.user.v1.NotificationProfileBAZ?github.com/deimossy/order-processing-system/api/user/v1;user_v1b\x06proto3"
 
 var (
 	file_user_v1_user_proto_rawDescOnce sync.Once
@@ -435,7 +480,7 @@ func file_user_v1_user_proto_rawDescGZIP() []byte {
 	return file_user_v1_user_proto_rawDescData
 }
 
-var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_user_v1_user_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_user_v1_user_proto_goTypes = []any{
 	(*RegisterRequest)(nil),       // 0: user.v1.RegisterRequest
 	(*LoginRequest)(nil),          // 1: user.v1.LoginRequest
@@ -443,28 +488,30 @@ var file_user_v1_user_proto_goTypes = []any{
 	(*LogoutRequest)(nil),         // 3: user.v1.LogoutRequest
 	(*GetProfileRequest)(nil),     // 4: user.v1.GetProfileRequest
 	(*TokenPair)(nil),             // 5: user.v1.TokenPair
-	(*UserProfile)(nil),           // 6: user.v1.UserProfile
-	(*timestamppb.Timestamp)(nil), // 7: google.protobuf.Timestamp
-	(*emptypb.Empty)(nil),         // 8: google.protobuf.Empty
+	(*NotificationProfile)(nil),   // 6: user.v1.NotificationProfile
+	(*PaymentProfile)(nil),        // 7: user.v1.PaymentProfile
+	(*timestamppb.Timestamp)(nil), // 8: google.protobuf.Timestamp
+	(*emptypb.Empty)(nil),         // 9: google.protobuf.Empty
 }
 var file_user_v1_user_proto_depIdxs = []int32{
-	7, // 0: user.v1.TokenPair.access_token_expires_at:type_name -> google.protobuf.Timestamp
-	7, // 1: user.v1.UserProfile.created_at:type_name -> google.protobuf.Timestamp
-	0, // 2: user.v1.UserService.Register:input_type -> user.v1.RegisterRequest
-	1, // 3: user.v1.UserService.Login:input_type -> user.v1.LoginRequest
-	2, // 4: user.v1.UserService.Refresh:input_type -> user.v1.RefreshRequest
-	3, // 5: user.v1.UserService.Logout:input_type -> user.v1.LogoutRequest
-	4, // 6: user.v1.UserService.GetProfile:input_type -> user.v1.GetProfileRequest
+	8, // 0: user.v1.TokenPair.access_token_expires_at:type_name -> google.protobuf.Timestamp
+	0, // 1: user.v1.UserService.Register:input_type -> user.v1.RegisterRequest
+	1, // 2: user.v1.UserService.Login:input_type -> user.v1.LoginRequest
+	2, // 3: user.v1.UserService.Refresh:input_type -> user.v1.RefreshRequest
+	3, // 4: user.v1.UserService.Logout:input_type -> user.v1.LogoutRequest
+	4, // 5: user.v1.UserService.GetPaymentProfile:input_type -> user.v1.GetProfileRequest
+	4, // 6: user.v1.UserService.GetNotificationProfile:input_type -> user.v1.GetProfileRequest
 	5, // 7: user.v1.UserService.Register:output_type -> user.v1.TokenPair
 	5, // 8: user.v1.UserService.Login:output_type -> user.v1.TokenPair
 	5, // 9: user.v1.UserService.Refresh:output_type -> user.v1.TokenPair
-	8, // 10: user.v1.UserService.Logout:output_type -> google.protobuf.Empty
-	6, // 11: user.v1.UserService.GetProfile:output_type -> user.v1.UserProfile
-	7, // [7:12] is the sub-list for method output_type
-	2, // [2:7] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	9, // 10: user.v1.UserService.Logout:output_type -> google.protobuf.Empty
+	7, // 11: user.v1.UserService.GetPaymentProfile:output_type -> user.v1.PaymentProfile
+	6, // 12: user.v1.UserService.GetNotificationProfile:output_type -> user.v1.NotificationProfile
+	7, // [7:13] is the sub-list for method output_type
+	1, // [1:7] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_user_v1_user_proto_init() }
@@ -478,7 +525,7 @@ func file_user_v1_user_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_user_v1_user_proto_rawDesc), len(file_user_v1_user_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

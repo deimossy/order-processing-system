@@ -849,22 +849,22 @@ var _ interface {
 	ErrorName() string
 } = TokenPairValidationError{}
 
-// Validate checks the field values on UserProfile with the rules defined in
-// the proto definition for this message. If any rules are violated, the first
-// error encountered is returned, or nil if there are no violations.
-func (m *UserProfile) Validate() error {
+// Validate checks the field values on NotificationProfile with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the first error encountered is returned, or nil if there are no violations.
+func (m *NotificationProfile) Validate() error {
 	return m.validate(false)
 }
 
-// ValidateAll checks the field values on UserProfile with the rules defined in
-// the proto definition for this message. If any rules are violated, the
-// result is a list of violation errors wrapped in UserProfileMultiError, or
-// nil if none found.
-func (m *UserProfile) ValidateAll() error {
+// ValidateAll checks the field values on NotificationProfile with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, the result is a list of violation errors wrapped in
+// NotificationProfileMultiError, or nil if none found.
+func (m *NotificationProfile) ValidateAll() error {
 	return m.validate(true)
 }
 
-func (m *UserProfile) validate(all bool) error {
+func (m *NotificationProfile) validate(all bool) error {
 	if m == nil {
 		return nil
 	}
@@ -875,48 +875,20 @@ func (m *UserProfile) validate(all bool) error {
 
 	// no validation rules for Email
 
-	if all {
-		switch v := interface{}(m.GetCreatedAt()).(type) {
-		case interface{ ValidateAll() error }:
-			if err := v.ValidateAll(); err != nil {
-				errors = append(errors, UserProfileValidationError{
-					field:  "CreatedAt",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		case interface{ Validate() error }:
-			if err := v.Validate(); err != nil {
-				errors = append(errors, UserProfileValidationError{
-					field:  "CreatedAt",
-					reason: "embedded message failed validation",
-					cause:  err,
-				})
-			}
-		}
-	} else if v, ok := interface{}(m.GetCreatedAt()).(interface{ Validate() error }); ok {
-		if err := v.Validate(); err != nil {
-			return UserProfileValidationError{
-				field:  "CreatedAt",
-				reason: "embedded message failed validation",
-				cause:  err,
-			}
-		}
-	}
-
 	if len(errors) > 0 {
-		return UserProfileMultiError(errors)
+		return NotificationProfileMultiError(errors)
 	}
 
 	return nil
 }
 
-// UserProfileMultiError is an error wrapping multiple validation errors
-// returned by UserProfile.ValidateAll() if the designated constraints aren't met.
-type UserProfileMultiError []error
+// NotificationProfileMultiError is an error wrapping multiple validation
+// errors returned by NotificationProfile.ValidateAll() if the designated
+// constraints aren't met.
+type NotificationProfileMultiError []error
 
 // Error returns a concatenation of all the error messages it wraps.
-func (m UserProfileMultiError) Error() string {
+func (m NotificationProfileMultiError) Error() string {
 	msgs := make([]string, 0, len(m))
 	for _, err := range m {
 		msgs = append(msgs, err.Error())
@@ -925,11 +897,11 @@ func (m UserProfileMultiError) Error() string {
 }
 
 // AllErrors returns a list of validation violation errors.
-func (m UserProfileMultiError) AllErrors() []error { return m }
+func (m NotificationProfileMultiError) AllErrors() []error { return m }
 
-// UserProfileValidationError is the validation error returned by
-// UserProfile.Validate if the designated constraints aren't met.
-type UserProfileValidationError struct {
+// NotificationProfileValidationError is the validation error returned by
+// NotificationProfile.Validate if the designated constraints aren't met.
+type NotificationProfileValidationError struct {
 	field  string
 	reason string
 	cause  error
@@ -937,22 +909,24 @@ type UserProfileValidationError struct {
 }
 
 // Field function returns field value.
-func (e UserProfileValidationError) Field() string { return e.field }
+func (e NotificationProfileValidationError) Field() string { return e.field }
 
 // Reason function returns reason value.
-func (e UserProfileValidationError) Reason() string { return e.reason }
+func (e NotificationProfileValidationError) Reason() string { return e.reason }
 
 // Cause function returns cause value.
-func (e UserProfileValidationError) Cause() error { return e.cause }
+func (e NotificationProfileValidationError) Cause() error { return e.cause }
 
 // Key function returns key value.
-func (e UserProfileValidationError) Key() bool { return e.key }
+func (e NotificationProfileValidationError) Key() bool { return e.key }
 
 // ErrorName returns error name.
-func (e UserProfileValidationError) ErrorName() string { return "UserProfileValidationError" }
+func (e NotificationProfileValidationError) ErrorName() string {
+	return "NotificationProfileValidationError"
+}
 
 // Error satisfies the builtin error interface
-func (e UserProfileValidationError) Error() string {
+func (e NotificationProfileValidationError) Error() string {
 	cause := ""
 	if e.cause != nil {
 		cause = fmt.Sprintf(" | caused by: %v", e.cause)
@@ -964,14 +938,14 @@ func (e UserProfileValidationError) Error() string {
 	}
 
 	return fmt.Sprintf(
-		"invalid %sUserProfile.%s: %s%s",
+		"invalid %sNotificationProfile.%s: %s%s",
 		key,
 		e.field,
 		e.reason,
 		cause)
 }
 
-var _ error = UserProfileValidationError{}
+var _ error = NotificationProfileValidationError{}
 
 var _ interface {
 	Field() string
@@ -979,4 +953,108 @@ var _ interface {
 	Key() bool
 	Cause() error
 	ErrorName() string
-} = UserProfileValidationError{}
+} = NotificationProfileValidationError{}
+
+// Validate checks the field values on PaymentProfile with the rules defined in
+// the proto definition for this message. If any rules are violated, the first
+// error encountered is returned, or nil if there are no violations.
+func (m *PaymentProfile) Validate() error {
+	return m.validate(false)
+}
+
+// ValidateAll checks the field values on PaymentProfile with the rules defined
+// in the proto definition for this message. If any rules are violated, the
+// result is a list of violation errors wrapped in PaymentProfileMultiError,
+// or nil if none found.
+func (m *PaymentProfile) ValidateAll() error {
+	return m.validate(true)
+}
+
+func (m *PaymentProfile) validate(all bool) error {
+	if m == nil {
+		return nil
+	}
+
+	var errors []error
+
+	// no validation rules for UserId
+
+	// no validation rules for PaymentDetails
+
+	if len(errors) > 0 {
+		return PaymentProfileMultiError(errors)
+	}
+
+	return nil
+}
+
+// PaymentProfileMultiError is an error wrapping multiple validation errors
+// returned by PaymentProfile.ValidateAll() if the designated constraints
+// aren't met.
+type PaymentProfileMultiError []error
+
+// Error returns a concatenation of all the error messages it wraps.
+func (m PaymentProfileMultiError) Error() string {
+	msgs := make([]string, 0, len(m))
+	for _, err := range m {
+		msgs = append(msgs, err.Error())
+	}
+	return strings.Join(msgs, "; ")
+}
+
+// AllErrors returns a list of validation violation errors.
+func (m PaymentProfileMultiError) AllErrors() []error { return m }
+
+// PaymentProfileValidationError is the validation error returned by
+// PaymentProfile.Validate if the designated constraints aren't met.
+type PaymentProfileValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PaymentProfileValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PaymentProfileValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PaymentProfileValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PaymentProfileValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PaymentProfileValidationError) ErrorName() string { return "PaymentProfileValidationError" }
+
+// Error satisfies the builtin error interface
+func (e PaymentProfileValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPaymentProfile.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PaymentProfileValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PaymentProfileValidationError{}
