@@ -3,6 +3,7 @@ package grpc
 import (
 	"context"
 	"errors"
+
 	"github.com/deimossy/order-processing-system/internal/user/usecase"
 	errs "github.com/deimossy/order-processing-system/pkg/errors"
 	user_v1 "github.com/deimossy/order-processing-system/protobuf/user/v1"
@@ -96,12 +97,40 @@ func (c *Controller) Logout(ctx context.Context, req *user_v1.LogoutRequest) (*e
 	return &emptypb.Empty{}, status.Error(codes.OK, "user logout")
 }
 
-func (c *Controller) GetProfile(ctx context.Context, req *user_v1.GetProfileRequest) (*user_v1.UserProfile, error) {
+func (c *Controller) GetPaymentProfile(ctx context.Context, req *user_v1.GetProfileRequest) (*user_v1.PaymentProfile, error) {
 	if err := req.Validate(); err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	return nil, status.Errorf(codes.OK, "method: GetProfile not implemented")
+	user, err := c.svc.GetUserByID(ctx, req.UserId)
+	if err != nil {
+		return nil, writeGRPCStatus(err)
+	}
+
+	paymentProfile := &user_v1.PaymentProfile{
+		UserId:         user.ID,
+		PaymentDetails: user.Email,
+	}
+
+	return paymentProfile, status.Errorf(codes.OK, "notification profile returned")
+}
+
+func (c *Controller) GetNotificationProfile(ctx context.Context, req *user_v1.GetProfileRequest) (*user_v1.NotificationProfile, error) {
+	if err := req.Validate(); err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	user, err := c.svc.GetUserByID(ctx, req.UserId)
+	if err != nil {
+		return nil, writeGRPCStatus(err)
+	}
+
+	notificationProfile := &user_v1.NotificationProfile{
+		UserId: user.ID,
+		Email:  user.Email,
+	}
+
+	return notificationProfile, status.Errorf(codes.OK, "notification profile returned")
 }
 
 func writeGRPCStatus(err error) error {
