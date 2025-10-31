@@ -4,11 +4,12 @@ import (
 	"context"
 	"crypto/rsa"
 	"errors"
+	"time"
+
 	"github.com/deimossy/order-processing-system/internal/user/auth"
 	"github.com/deimossy/order-processing-system/internal/user/config"
 	"github.com/deimossy/order-processing-system/internal/user/domain"
 	errs "github.com/deimossy/order-processing-system/pkg/errors"
-	"time"
 )
 
 type RefreshTokenRepo interface {
@@ -47,6 +48,28 @@ func NewUserService(cfg config.Config, uow UnitOfWork, key *rsa.PrivateKey) *Use
 		uow:        uow,
 		privateKey: key,
 	}
+}
+
+func (s *UserService) GetUserByID(ctx context.Context, id string) (*domain.User, error) {
+	var user *domain.User
+
+	err := s.uow.WithoutTx(ctx, func(ctx context.Context, repos Repositories) error {
+		userDB, err := repos.UserRepo().GetByID(ctx, id)
+		if err != nil {
+			if errors.Is(err, errs.ErrNotFound) {
+				return errs.ErrUserNotFound
+			}
+			return err
+		}
+		user = userDB
+		return nil
+	})
+
+	if err != nil {
+		return nil, err
+	}
+
+	return user, nil
 }
 
 func (s *UserService) Register(ctx context.Context, email, password string) (*domain.TokenPair, error) {
