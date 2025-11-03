@@ -5,13 +5,18 @@ import (
 	"errors"
 	"time"
 
-	"github.com/deimossy/order-processing-system/internal/user/domain"
 	errs "github.com/deimossy/order-processing-system/pkg/errors"
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func ParseAndValidateAccessToken(token string, pubKey *rsa.PublicKey) (*domain.AccessTokenClaims, error) {
-	claims := &domain.AccessTokenClaims{}
+// обертка над дефолтными клеймсами
+type AccessTokenClaims struct {
+	Email string `json:"email"`
+	jwt.RegisteredClaims
+}
+
+func ParseAndValidateAccessToken(token string, pubKey *rsa.PublicKey) (*AccessTokenClaims, error) {
+	claims := &AccessTokenClaims{}
 
 	parsed, err := jwt.ParseWithClaims(token, claims, func(t *jwt.Token) (any, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodRSA); !ok {
@@ -37,7 +42,7 @@ func ParseAndValidateAccessToken(token string, pubKey *rsa.PublicKey) (*domain.A
 	return claims, nil
 }
 
-func jwtFieldsValid(claims *domain.AccessTokenClaims) bool {
+func jwtFieldsValid(claims *AccessTokenClaims) bool {
 	if claims.Subject == "" || claims.ID == "" || claims.IssuedAt == nil || claims.Email == "" {
 		return false
 	} else {
