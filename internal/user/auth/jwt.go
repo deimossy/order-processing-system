@@ -2,6 +2,7 @@ package auth
 
 import (
 	"crypto/rsa"
+	"errors"
 	"os"
 	"time"
 
@@ -24,6 +25,10 @@ func LoadPrivateKey(path string) (*rsa.PrivateKey, error) {
 }
 
 func GenerateAccessToken(userID, email string, privKey *rsa.PrivateKey, ttl time.Duration) (string, time.Time, error) {
+	if privKey == nil {
+		return "", time.Time{}, errors.New("private key is required")
+	}
+
 	exp := time.Now().UTC().Add(ttl)
 
 	claims := &jwt.MapClaims{
