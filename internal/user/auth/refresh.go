@@ -34,7 +34,7 @@ func generatePlainToken(n int) (string, error) {
 	b := make([]byte, n)
 	_, err := rand.Read(b)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	return base64.URLEncoding.EncodeToString(b), nil
 }
