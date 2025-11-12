@@ -64,7 +64,6 @@ func (s *UserService) GetUserByID(ctx context.Context, id string) (*domain.User,
 		user = userDB
 		return nil
 	})
-
 	if err != nil {
 		return nil, err
 	}
